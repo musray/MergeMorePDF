@@ -1,6 +1,8 @@
 import re,os,operator,sys
 from PyPDF2 import PdfFileReader, PdfFileMerger, utils
 
+version = "mergeMorePDF v.0.3"
+
 runningDt = os.getcwd()
 BDSDDt = runningDt + '/BDSD' #where the BDSD and content.txt are put in
 tableDt = runningDt + '/testtable' #where the testtablePDF are put in.
