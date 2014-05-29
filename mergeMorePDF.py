@@ -1,7 +1,7 @@
 import re,os,operator,sys
 from PyPDF2 import PdfFileReader, PdfFileMerger, utils
 
-version = "mergeMorePDF v.0.3"
+version = "mergeMorePDF v0.3, Author@Chu Rui"
 
 runningDt = os.getcwd()
 BDSDDt = runningDt + '/BDSD' #where the BDSD and content.txt are put in
@@ -9,6 +9,7 @@ tableDt = runningDt + '/testtable' #where the testtablePDF are put in.
 contentTXT = BDSDDt + '/content.txt'
 BDSDFullName = ''
 BDSDName = ''
+infoBoard = []  #store the error or warning messages. Used in message function.
 
 #follows are variables for test table PDF files.
 testItems = []
@@ -243,8 +244,12 @@ This process is forced to stop. Please check both files and then start over agai
             startPage = int(testItemsPagesInitial[getTestItem(testTableDict[testTable])])
         except KeyError as k:
             exceptCount = True
-            print "\nError: '%s'" % testTable
-            print "Above file is failed to merge into BDSD. You may want to abort this process and check both:\n    1. file name of test table, or\n    2. BDSD page number."
+            errorMessage1_1 =  "\nError: '%s'" % testTable
+            errorMessage1_2 =  "Above file is failed to merge into BDSD. You may want to abort this process and check both:\n    1. file name of test table, or\n    2. BDSD page number."
+            print errorMessage1_1 
+            print errorMessage1_2 
+            message(errorMessage1_1)
+            message(errorMessage1_2)
         position = startPage 
         fileObj = PdfFileReader(file(testTable,'rb'))
         tableCount += 1
@@ -260,15 +265,39 @@ This process is forced to stop. Please check both files and then start over agai
         merger1.write(open('merger output.pdf','wb'))
     except:
         utils.PdfReadError()
-        print "\nError: There's an error occured during generate the final output PDF file, please feedback this issue to ChuRui, thanks a lot.\n"
+        errorMessage =  "\nError: There's an error occured during generate the final output PDF file, please feedback this issue to ChuRui, thanks a lot.\n"
+        print errorMessage 
+        message(errorMessage)
     if exceptCount:
-        print "Warning: output PDF file couldn't be used in case there is an Error.\n"
+        warningMessage= "Warning: output PDF file couldn't be used in case there is an Error.\n"
+        print warningMessage
+        message(warningMessage)
     else:
         print "\n%d Test Tables successfully merged to \"%s\", please check the output file." % (tableCount, BDSDFullName[0])
     #print testItemsPagesInitial
 
+def message(info):
+    global infoBoard
+    infoBoard.append(info)
+
+def outputMessage():
+    global infoBoard
+    f = file('output.txt','a')
+    for i in infoBoard:
+        f.write(i)
+    f.close()
+
     
-walkTableDirectory(tableDt)
-walkBDSDDirectory(BDSDDt)
-manipulatePDF()
-raw_input('Press any key to quit...')
+
+def main():
+    global infoBoard
+    walkTableDirectory(tableDt)
+    walkBDSDDirectory(BDSDDt)
+    manipulatePDF()
+    outputMessage()
+    raw_input('Press any key to quit...')
+
+if __name__ == '__main__':
+    print version
+    main()
+
